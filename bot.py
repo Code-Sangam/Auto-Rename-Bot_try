@@ -1,5 +1,4 @@
 import logging
-import logging.config
 import warnings
 from pyrogram import Client, idle
 from pyrogram import Client, __version__
@@ -9,11 +8,13 @@ from aiohttp import web
 from pytz import timezone
 from datetime import datetime
 import asyncio
-from plugins.web_support import web_server
 import pyromod
 
-logging.config.fileConfig("logging.conf")
-logging.getLogger().setLevel(logging.INFO)
+# Configure logging for Railway
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
 
@@ -34,10 +35,16 @@ class Bot(Client):
         me = await self.get_me()
         self.mention = me.mention
         self.username = me.username
-        app = web.AppRunner(await web_server())
-        await app.setup()
+        # Simple web server for Railway health checks
+        async def health_check(request):
+            return web.json_response({"status": "running", "bot": me.first_name})
+        
+        app = web.Application()
+        app.router.add_get("/", health_check)
+        runner = web.AppRunner(app)
+        await runner.setup()
         bind_address = "0.0.0.0"
-        await web.TCPSite(app, bind_address, Config.PORT).start()
+        await web.TCPSite(runner, bind_address, Config.PORT).start()
         logging.info(f"{me.first_name} ✅✅ BOT started successfully ✅✅")
 
         for id in Config.ADMIN:
@@ -70,11 +77,10 @@ bot_instance = Bot()
 
 def main():
     async def start_services():
-        await asyncio.gather(bot_instance.start())
+        await bot_instance.start()
+        await idle()
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_services())
-    loop.run_forever()
+    asyncio.run(start_services())
 
 
 if __name__ == "__main__":
