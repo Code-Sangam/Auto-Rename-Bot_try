@@ -8,13 +8,22 @@ FORCE_SUB_CHANNELS = Config.FORCE_SUB_CHANNELS
 
 
 async def not_subscribed(_, __, message):
+    if not FORCE_SUB_CHANNELS or FORCE_SUB_CHANNELS == ['']:
+        return False
+    
     for channel in FORCE_SUB_CHANNELS:
+        if not channel or channel.strip() == '':
+            continue
         try:
             user = await message._client.get_chat_member(channel, message.from_user.id)
             if user.status in {"kicked", "left"}:
                 return True
         except UserNotParticipant:
             return True
+        except Exception as e:
+            # If bot can't access the channel, skip force subscription
+            print(f"Error checking subscription for {channel}: {e}")
+            continue
     return False
 
 
@@ -22,12 +31,18 @@ async def not_subscribed(_, __, message):
 async def forces_sub(client, message):
     not_joined_channels = []
     for channel in FORCE_SUB_CHANNELS:
+        if not channel or channel.strip() == '':
+            continue
         try:
             user = await client.get_chat_member(channel, message.from_user.id)
             if user.status in {"kicked", "left"}:
                 not_joined_channels.append(channel)
         except UserNotParticipant:
             not_joined_channels.append(channel)
+        except Exception as e:
+            # Skip channels that can't be accessed
+            print(f"Error checking subscription for {channel}: {e}")
+            continue
 
     buttons = [
         [
@@ -55,12 +70,18 @@ async def check_subscription(client, callback_query: CallbackQuery):
     not_joined_channels = []
 
     for channel in FORCE_SUB_CHANNELS:
+        if not channel or channel.strip() == '':
+            continue
         try:
             user = await client.get_chat_member(channel, user_id)
             if user.status in {"kicked", "left"}:
                 not_joined_channels.append(channel)
         except UserNotParticipant:
             not_joined_channels.append(channel)
+        except Exception as e:
+            # Skip channels that can't be accessed
+            print(f"Error checking subscription for {channel}: {e}")
+            continue
 
     if not not_joined_channels:
         await callback_query.message.edit_text(
