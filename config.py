@@ -1,5 +1,5 @@
 import re, os, time
-id_pattern = re.compile(r'^.\d+$') 
+id_pattern = re.compile(r'^.\d+')
 
 class Config(object):
     # pyro client config
@@ -17,8 +17,8 @@ class Config(object):
     ADMIN       = [int(admin) if id_pattern.search(admin) else admin for admin in os.environ.get('ADMIN', '').split()]
     # -- FORCE_SUB_CHANNELS = ["BotzPW","AshuSupport","AshutoshGoswami24"] -- # 
     FORCE_SUB_CHANNELS = os.environ.get('FORCE_SUB_CHANNELS', 'AshutoshGoswami24,BotzPW').split(',')
-    LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", ""))
-    PORT = int(os.environ.get("PORT", ""))
+    LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", "0")) if os.environ.get("LOG_CHANNEL") else None
+    PORT = int(os.environ.get("PORT", "8080"))
     
     # wes response configuration     
     WEBHOOK = bool(os.environ.get("WEBHOOK", "True"))
@@ -55,9 +55,9 @@ Use These Keywords To Setup Custom File Name
     
     ABOUT_TXT = f"""<b>🤖 My Name :</b>
 <b>📝 Language :</b> <a href='https://python.org'>Python 3</a>
-<b>📚 Library :</b> <a href='https://pyrogram.org'>Pyrogram 2.0</a>
-<b>🚀 Server :</b> <a href='https://heroku.com'>Heroku</a>
-<b>🧑‍💻 Developer :</b> <a href='https://t.me/AshutoshGoswami24'>PandaWep</a>
+<b>� Laibrary :</b> <a href='https://pyrogram.org'>Pyrogram 2.0</a>
+<b>�  Server :</b> <a href='https://heroku.com'>Heroku</a>
+<b>🧑‍� Devel<oper :</b> <a href='https://t.me/AshutoshGoswami24'>PandaWep</a>
     
 <b>♻️ Bot Made By :</b> @AshutoshGoswami24"""
 
@@ -69,9 +69,9 @@ Use These Keywords To Setup Custom File Name
 ⦿ /viewthumb - Use This Command To See Your Thumbnail
 ⦿ /delthumb - Use This Command To Delete Your Thumbnail"""
 
-    CAPTION_TXT = """<b><u>📝  HOW TO SET CAPTION</u></b>
+    CAPTION_TXT = """<b><u>📝  HOW TO SET CAPTION</u></b>
     
-⦿ /set_caption - Use This Command To Set Your Caption
+⦿ /set_caption - Use This Command To Set Your Caption
 ⦿ /see_caption - Use This Command To See Your Caption
 ⦿ /del_caption - Use This Command To Delete Your Caption"""
 
@@ -94,8 +94,3 @@ If You Like My Bots & Projects, You Can 🎁 Donate Me Any Amount From 10 Rs Upt
     HELP_TXT = """<b>Hey</b> {}
     
 Joine @AshutoshGoswami24 To Help """
-
-
-
-
-
